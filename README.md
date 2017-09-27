@@ -10,3 +10,4 @@ Remove duplicates from Arraylist that has linkedhashmap
 
 UncompressAndGiveOuput : uncompress a JSON file and give to Mulesoft
 
+Datatime formart or convert from EST to GMT
