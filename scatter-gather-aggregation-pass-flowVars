@@ -13,7 +13,8 @@ public class AssignPayloadToFlowVars extends CollectAllAggregationStrategy imple
 
 	@Override
 	public MuleEvent aggregate(AggregationContext context) throws MuleException {
-		// TODO Auto-generated method stub
+	
+	// would need CollectAllAggregationStrategy as to get access to the Muleevent and thus assign flowVars past the scatter-gather.
         MuleEvent event = super.aggregate(context);
 
 		List<MuleEvent> listEvents =  context.getEvents();
