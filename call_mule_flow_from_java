@@ -1,0 +1,159 @@
+import java.util.Set;
+
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.session.DefaultMuleSession;
+
+public class GetNextURICanvas implements Callable, FlowConstructAware, MuleContextAware {
+
+	MuleContext mContext;
+	FlowConstruct flowConstruct;
+
+	@Override
+	public void setMuleContext(MuleContext context) {
+		this.mContext = context;
+	}
+
+
+	@Override
+	public void setFlowConstruct(FlowConstruct flowConstruct) {
+		this.flowConstruct = flowConstruct;		
+	}
+
+	
+	@Override
+	public Object onCall(MuleEventContext eventContext) throws Exception {
+		
+		String strPayload = eventContext.getMessage().getPayload().toString();
+		
+		String subDomain = eventContext.getMessage().getInvocationProperty("subDomain");
+		String subDomainBasepath = eventContext.getMessage().getInvocationProperty("subDomainBasepath"); 
+		
+//		if (strPayload.trim().isEmpty() || getNextURL( strPayload, subDomain, subDomainBasepath ) != "")
+//			return "";
+		
+		try {
+			do {
+				MessageProcessor subFlow = mContext.getRegistry().lookupObject("common-codeFlow");
+				MuleMessage muleMessage = new DefaultMuleMessage(eventContext.getMessage(), mContext);
+				muleMessage.setPayload(getNextURL(strPayload, subDomain, subDomainBasepath));
+				System.out.println("In Java Class : Getting data for URL : "  + muleMessage.getPayloadAsString());
+//				@SuppressWarnings("deprecation")
+//				MuleEvent inputEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE,
+//			    new DefaultMuleSession());
+				
+				MuleEvent inputEvent = new DefaultMuleEvent(muleMessage, MessageExchangePattern.REQUEST_RESPONSE,
+						mContext.getRegistry().lookupFlowConstruct("common-codeFlow") ,new DefaultMuleSession() );
+						
+				Set<String> flowVars = eventContext.getMessage().getInvocationPropertyNames();
+				for (String flowVar : flowVars)
+				{
+					inputEvent.setFlowVariable(flowVar, eventContext.getMessage().getInvocationProperty(flowVar));
+				}
+				
+				MuleEvent result = subFlow.process(inputEvent);
+				if (result.getMessage().getInboundProperty("Links") != null)
+				{
+					System.out.println(result.getMessage().getInboundProperty("Links").toString());
+					strPayload = result.getMessage().getInboundProperty("Links").toString();
+				}
+				
+			} while (getNextURL( strPayload, subDomain, subDomainBasepath ) != "");
+					
+					
+//					eventContext.getMessage().setPayload(nextURI);
+//					
+//					Flow flow = (Flow) eventContext.getMuleContext().getRegistry().lookupFlowConstruct("common-codeSub_Flow");
+//					
+//					MuleEvent muleEvent = new DefaultMuleEvent(eventContext.getMessage(),
+//							eventContext.getExchangePattern() , flow);
+					
+					//MessageProcessor subFlow = eventContext.getMuleContext().getRegistry().lookupObject("common-codeSub_Flow");
+					
+//					final MuleEvent muleEvent = new DefaultMuleEvent(
+//		                     new DefaultMuleMessage(eventContext.getMessage(), eventContext.getMuleContext()),
+//		                     MessageExchangePattern.REQUEST_RESPONSE, MuleTestUtils.getTestFlow(eventContext.getMuleContext()));
+					
+					//Object obj = subFlow.process(muleEvent).getMessage().getPayload();
+					
+//					Object obj = flow.process(muleEvent).getMessage().getPayload();
+//					System.out.println("sub flow payload ---- " + obj);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		System.out.println("concurrent issues : 5-out");
+		//return nextURI.replace(subDomain, "").replace(subDomainBasepath, "").replace("https://", "") ;
+		return "";
+	}
+
+	private String getNextURL(String strLinks, String subDomain, String subDomainBasepath )
+	{
+		String nextURL = "";
+		String[] links = strLinks.split(",");
+		//System.out.println("concurrent issues : 1");
+		
+		try {
+			for (String link : links)
+			{
+//				System.out.println("concurrent issues : 2");
+				if (link.contains("rel=\"next\""))
+				{
+//					System.out.println("concurrent issues : 3");
+					nextURL = link.split(";")[0].toString().replaceAll("[<>]", "" );
+					nextURL = nextURL.replace(subDomain, "").replace(subDomainBasepath, "").replace("https://", "") ;
+				}
+			}
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return nextURL;
+		
+	}
+//	@Override
+//	public void setFlowConstruct(FlowConstruct flowConstruct) {
+//
+//			this.flowConstruct = flowConstruct;
+//	}
+
+
+
+//@Override
+//public MuleEvent process(MuleEvent event) throws MuleException {
+//	// TODO Auto-generated method stub
+//	muleEvent = event;
+//	return muleEvent;
+//}
+
+
+
+}
+
+
+
+//MessageProcessor subFlow = eventContext.getMuleContext().getRegistry().lookupObject("common-process-next-url");
+//
+//eventContext.getMessage().setPayload(nextURI);
+//
+//@SuppressWarnings("deprecation")
+//MuleEvent inputEvent = new DefaultMuleEvent(eventContext.getMessage(), MessageExchangePattern.REQUEST_RESPONSE , eventContext.getSession());
+//
+////MuleEvent inputEvent1 = new DefaultMuleEvent(eventContext.getMessage(), (MuleEvent) eventContext.getSession());
+//
+////muleMessage, MessageExchangePattern.REQUEST_RESPONSE,   muleEvent
+//
+//MuleEvent result = subFlow.process(inputEvent);
+//System.out.println(result.getMessage().getPayload().toString());
+   
