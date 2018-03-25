@@ -1,0 +1,35 @@
+package com.bisk.autowithdrawals;
+
+import java.util.List;
+import java.util.Set;
+
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.routing.AggregationContext;
+import org.mule.routing.AggregationStrategy;
+import org.mule.routing.CollectAllAggregationStrategy;
+
+public class AssignPayloadToFlowVars extends CollectAllAggregationStrategy implements AggregationStrategy {
+
+	@Override
+	public MuleEvent aggregate(AggregationContext context) throws MuleException {
+		// TODO Auto-generated method stub
+        MuleEvent event = super.aggregate(context);
+
+		List<MuleEvent> listEvents =  context.getEvents();
+		
+		for (MuleEvent muleEvent : listEvents)
+		{
+			if (muleEvent != null)
+			{
+				Set<String> flowVars = muleEvent.getFlowVariableNames();
+				for (String flowVar : flowVars)
+				{
+					event.setFlowVariable(flowVar, muleEvent.getFlowVariable(flowVar));
+				}
+			}
+		}
+		return event;
+	}
+
+}
