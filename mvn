@@ -1,0 +1,7 @@
+
+mvn install:install-file -Dfile=D:\jar\datetimeformatter-4.0.jar -DgroupId=com.bisk -DartifactId=datetimeformatter -Dversion=4.0 -Dpackaging=mule
+
+mvn install:install-file -Dfile=D:\jar\datetimeformatter-3.0.jar -DgroupId=com.bisk -DartifactId=datetimeformatter -Dversion=3.0 -Dpackaging=mule
+
+mvn install:install-file -Dfile=D:\jar\bisk-comn-alert-notify-service-1.0.jar -DgroupId=com.bisk -DartifactId=bisk-comn-alert-notify-service -Dversion=1.0 -Dpackaging=mule
+
