@@ -1,0 +1,17 @@
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.6.1:compile (default-compile) on project demo: Compilation failure
+[ERROR] /D:/Mulesoft_WS/SMTP/src/main/java/demo/Uncompress.java:[25,59] diamond operator is not supported in -source 1.5
+[ERROR] (use -source 7 or higher to enable diamond operator)
+[ERROR] -> [Help 1]
+
+POM file update:
+
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>3.6.1</version>
+    <configuration>
+        <source>1.8</source>
+        <target>1.8</target>
+    </configuration>
+</plugin>
