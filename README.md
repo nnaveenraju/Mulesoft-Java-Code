@@ -15,3 +15,7 @@ Datatime formart or convert from EST to GMT
 
 File : Update scatter-gather-aggregation-pass-flowVars 
     -> Code to pass flowVars from scatter-gaher scope.
+
+Reference URI:
+
+https://www.ricston.com/blog/using-java-code-mule/
